@@ -4,7 +4,7 @@ This project is a simulated IRCTC ticket booking system designed to demonstrate 
 
 Key Features:
 
-Train Search & Booking – Find trains and book tickets with ease
+Train/Flight Search & Booking – Find trains/flights and book tickets with ease
 
 User Management – Register, login, and manage user profiles
 
