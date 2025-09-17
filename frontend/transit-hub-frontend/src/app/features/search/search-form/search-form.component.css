@@ -1,0 +1,32 @@
+/* Component-specific styles */
+.search-form {
+  /* Custom styles for search form */
+}
+
+/* Custom mat-button-toggle styling */
+mat-button-toggle-group {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+mat-button-toggle {
+  border: none !important;
+  font-weight: 500;
+}
+
+mat-button-toggle.mat-button-toggle-checked {
+  background-color: #1976d2 !important;
+  color: white !important;
+}
+
+/* Form field spacing */
+.mat-form-field {
+  margin-bottom: 0;
+}
+
+/* Grid responsive adjustments */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

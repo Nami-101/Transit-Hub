@@ -145,7 +145,36 @@ namespace TransitHub.Repositories
                         
                         if (property != null && reader[i] != DBNull.Value)
                         {
-                            var value = Convert.ChangeType(reader[i], property.PropertyType);
+                            var value = reader[i];
+                            
+                            // Handle DateOnly conversion specially
+                            if (property.PropertyType == typeof(DateOnly) || property.PropertyType == typeof(DateOnly?))
+                            {
+                                if (value is DateTime dateTime)
+                                {
+                                    value = DateOnly.FromDateTime(dateTime);
+                                }
+                                else if (value is string dateString && DateTime.TryParse(dateString, out var parsedDate))
+                                {
+                                    value = DateOnly.FromDateTime(parsedDate);
+                                }
+                            }
+                            else if (property.PropertyType == typeof(TimeOnly) || property.PropertyType == typeof(TimeOnly?))
+                            {
+                                if (value is DateTime timeDateTime)
+                                {
+                                    value = TimeOnly.FromDateTime(timeDateTime);
+                                }
+                                else if (value is TimeSpan timeSpan)
+                                {
+                                    value = TimeOnly.FromTimeSpan(timeSpan);
+                                }
+                            }
+                            else
+                            {
+                                value = Convert.ChangeType(value, property.PropertyType);
+                            }
+                            
                             property.SetValue(item, value);
                         }
                     }

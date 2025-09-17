@@ -1,4 +1,6 @@
 using Microsoft.Data.SqlClient;
+using System.Data;
+using Microsoft.Data.SqlClient;
 using TransitHub.Models.DTOs;
 using TransitHub.Repositories.Interfaces;
 using TransitHub.Services.Interfaces;
@@ -27,7 +29,7 @@ namespace TransitHub.Services
                     new SqlParameter("@DestinationStationID", (object?)searchDto.DestinationStationID ?? DBNull.Value),
                     new SqlParameter("@SourceStationCode", (object?)searchDto.SourceStationCode ?? DBNull.Value),
                     new SqlParameter("@DestinationStationCode", (object?)searchDto.DestinationStationCode ?? DBNull.Value),
-                    new SqlParameter("@TravelDate", searchDto.TravelDate.ToDateTime(TimeOnly.MinValue)),
+                    new SqlParameter("@TravelDate", searchDto.TravelDate.ToDateTime(TimeOnly.MinValue)) { SqlDbType = SqlDbType.Date },
                     new SqlParameter("@QuotaTypeID", (object?)searchDto.QuotaTypeID ?? DBNull.Value),
                     new SqlParameter("@TrainClassID", (object?)searchDto.TrainClassID ?? DBNull.Value),
                     new SqlParameter("@PassengerCount", searchDto.PassengerCount)
@@ -63,7 +65,7 @@ namespace TransitHub.Services
                     new SqlParameter("@DestinationAirportID", (object?)searchDto.DestinationAirportID ?? DBNull.Value),
                     new SqlParameter("@SourceAirportCode", (object?)searchDto.SourceAirportCode ?? DBNull.Value),
                     new SqlParameter("@DestinationAirportCode", (object?)searchDto.DestinationAirportCode ?? DBNull.Value),
-                    new SqlParameter("@TravelDate", searchDto.TravelDate.ToDateTime(TimeOnly.MinValue)),
+                    new SqlParameter("@TravelDate", searchDto.TravelDate.ToDateTime(TimeOnly.MinValue)) { SqlDbType = SqlDbType.Date },
                     new SqlParameter("@FlightClassID", (object?)searchDto.FlightClassID ?? DBNull.Value),
                     new SqlParameter("@PassengerCount", searchDto.PassengerCount)
                 };

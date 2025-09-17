@@ -1,0 +1,41 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+        Transit Hub - Search & Book
+      </h1>
+      
+      <!-- Search Form -->
+      <div class="mb-8">
+        <app-search-form 
+          (searchResults)="onSearchResults($event)"
+          (searchModeChange)="onSearchModeChange($event)"
+          (searchStart)="onSearchStart()">
+        </app-search-form>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+        <mat-spinner diameter="50"></mat-spinner>
+        <span class="ml-4 text-gray-600">Searching for {{searchMode}}s...</span>
+      </div>
+      
+      <!-- Search Results -->
+      <div *ngIf="!isLoading && searchResults.length > 0">
+        <app-search-results 
+          [results]="searchResults"
+          [searchMode]="searchMode">
+        </app-search-results>
+      </div>
+      
+      <!-- No Results -->
+      <div *ngIf="!isLoading && searchResults.length === 0 && searchResults !== null" 
+           class="text-center py-8">
+        <div class="text-gray-500">
+          <p class="text-lg">No {{searchMode}}s found for your search criteria.</p>
+          <p class="text-sm mt-2">Please try different dates or destinations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

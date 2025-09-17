@@ -1,0 +1,56 @@
+/* Component-specific styles */
+.search-results {
+  /* Custom styles for search results */
+}
+
+/* Table styling enhancements */
+.mat-table {
+  background: transparent;
+}
+
+.mat-header-cell {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.mat-cell {
+  padding: 16px 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.mat-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Custom badge styles */
+.availability-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .mat-table {
+    font-size: 0.875rem;
+  }
+  
+  .mat-cell, .mat-header-cell {
+    padding: 8px 4px;
+  }
+}
+
+/* Action button styling */
+.mat-raised-button {
+  text-transform: none;
+  font-weight: 500;
+}
+
+.mat-raised-button:disabled {
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
+}
