@@ -109,9 +109,12 @@ namespace TransitHub.Services
         {
             try
             {
+                _logger.LogInformation("Starting registration for user {Email}", request.Email);
+                
                 var existingUser = await _userManager.FindByEmailAsync(request.Email);
                 if (existingUser != null)
                 {
+                    _logger.LogWarning("Registration failed: User {Email} already exists", request.Email);
                     return ApiResponse.ErrorResult("User with this email already exists");
                 }
 
@@ -122,16 +125,28 @@ namespace TransitHub.Services
                     EmailConfirmed = true // Set to false if you want email confirmation
                 };
 
+                _logger.LogInformation("Creating user {Email} with Identity", request.Email);
                 var result = await _userManager.CreateAsync(user, request.Password);
 
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
+                    _logger.LogWarning("User creation failed for {Email}: {Errors}", request.Email, string.Join(", ", errors));
                     return ApiResponse.ErrorResult("Registration failed", errors);
                 }
 
-                // Add user to default role
-                await _userManager.AddToRoleAsync(user, "User");
+                // Try to add user to default role, but don't fail registration if role doesn't exist
+                try
+                {
+                    var roleExists = await _userManager.GetUsersInRoleAsync("User");
+                    await _userManager.AddToRoleAsync(user, "User");
+                    _logger.LogInformation("User {Email} added to 'User' role", request.Email);
+                }
+                catch (Exception roleEx)
+                {
+                    _logger.LogWarning(roleEx, "Could not add user {Email} to 'User' role, but registration succeeded", request.Email);
+                    // Don't fail the registration if role assignment fails
+                }
 
                 _logger.LogInformation("User {Email} registered successfully", request.Email);
                 return ApiResponse.SuccessResult("Registration successful");

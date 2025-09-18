@@ -44,7 +44,7 @@ import { LoginRequest, ApiResponse, LoginResponse } from '../../../models/auth.d
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
             
             <!-- Email Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Email</mat-label>
               <input matInput 
                      type="email" 
@@ -61,7 +61,7 @@ import { LoginRequest, ApiResponse, LoginResponse } from '../../../models/auth.d
             </mat-form-field>
 
             <!-- Password Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Password</mat-label>
               <input matInput 
                      [type]="hidePassword ? 'password' : 'text'"
@@ -116,6 +116,21 @@ import { LoginRequest, ApiResponse, LoginResponse } from '../../../models/auth.d
   styles: [`
     .mat-mdc-form-field {
       width: 100%;
+    }
+    
+    /* Fix text cutoff issues */
+    .mat-mdc-text-field-wrapper {
+      min-height: 56px;
+    }
+    
+    .mat-mdc-form-field-input-control {
+      height: auto;
+      line-height: normal;
+    }
+    
+    .mat-mdc-form-field .mat-mdc-form-field-input-control input {
+      padding: 16px 0 8px 0;
+      line-height: 1.5;
     }
   `]
 })

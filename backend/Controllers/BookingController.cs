@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TransitHub.Models.DTOs;
 using TransitHub.Services.Interfaces;
@@ -6,6 +7,7 @@ namespace TransitHub.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Require authentication for all booking operations
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -86,7 +88,15 @@ namespace TransitHub.Controllers
         {
             try
             {
-                // TODO: Add JWT authentication and ensure user can only access their own bookings
+                // Get current user ID from JWT token
+                var currentUserId = User?.FindFirst("sub")?.Value ?? User?.FindFirst("id")?.Value;
+                
+                // Ensure user can only access their own bookings
+                if (currentUserId != userId.ToString())
+                {
+                    return Forbid("You can only access your own bookings");
+                }
+                
                 var bookings = await _bookingService.GetUserBookingsAsync(userId, bookingType, status);
                 return Ok(bookings);
             }
@@ -109,7 +119,15 @@ namespace TransitHub.Controllers
         {
             try
             {
-                // TODO: Add JWT authentication and ensure user can only access their own bookings
+                // Get current user ID from JWT token
+                var currentUserId = User?.FindFirst("sub")?.Value ?? User?.FindFirst("id")?.Value;
+                
+                // Ensure user can only access their own bookings
+                if (currentUserId != userId.ToString())
+                {
+                    return Forbid("You can only access your own bookings");
+                }
+                
                 var bookingDetails = await _bookingService.GetBookingDetailsAsync(bookingId, userId);
                 return Ok(bookingDetails);
             }
@@ -139,7 +157,15 @@ namespace TransitHub.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // TODO: Add JWT authentication and get userId from token
+                // Get current user ID from JWT token
+                var currentUserId = User?.FindFirst("sub")?.Value ?? User?.FindFirst("id")?.Value;
+                
+                // Ensure user can only cancel their own bookings
+                if (currentUserId != cancelRequest.UserId.ToString())
+                {
+                    return Forbid("You can only cancel your own bookings");
+                }
+
                 var result = await _bookingService.CancelBookingAsync(bookingId, cancelRequest.UserId, cancelRequest.Reason);
                 
                 if (result.Success)

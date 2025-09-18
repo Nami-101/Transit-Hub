@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TransitHub.Models.DTOs;
 using TransitHub.Services.Interfaces;
@@ -21,6 +22,7 @@ namespace TransitHub.Controllers
         /// Search available trains
         /// </summary>
         [HttpPost("trains")]
+        [Authorize] // Require authentication for search
         public async Task<ActionResult<IEnumerable<TrainSearchResultDto>>> SearchTrains([FromBody] TrainSearchDto searchDto)
         {
             try
@@ -48,6 +50,7 @@ namespace TransitHub.Controllers
         /// Search available flights
         /// </summary>
         [HttpPost("flights")]
+        [Authorize] // Require authentication for search
         public async Task<ActionResult<IEnumerable<FlightSearchResultDto>>> SearchFlights([FromBody] FlightSearchDto searchDto)
         {
             try
@@ -75,6 +78,7 @@ namespace TransitHub.Controllers
         /// Get all stations
         /// </summary>
         [HttpGet("stations")]
+        [AllowAnonymous] // Allow public access for dropdown data
         public async Task<ActionResult<IEnumerable<StationDto>>> GetStations()
         {
             try
@@ -93,6 +97,7 @@ namespace TransitHub.Controllers
         /// Get all airports
         /// </summary>
         [HttpGet("airports")]
+        [AllowAnonymous] // Allow public access for dropdown data
         public async Task<ActionResult<IEnumerable<AirportDto>>> GetAirports()
         {
             try
@@ -111,6 +116,7 @@ namespace TransitHub.Controllers
         /// Get lookup data (quota types, classes, payment modes, etc.)
         /// </summary>
         [HttpGet("lookup-data")]
+        [AllowAnonymous] // Allow public access for dropdown data
         public async Task<ActionResult<LookupDataDto>> GetLookupData()
         {
             try

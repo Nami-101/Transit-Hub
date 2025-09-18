@@ -11,3 +11,73 @@
 /* Global styles */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* AGGRESSIVE fix for Material Design form field text cutoff issues */
+.mat-mdc-form-field {
+  margin-bottom: 16px !important;
+}
+
+/* Fix the outline appearance which causes the line through text */
+.mdc-notched-outline {
+  border: none !important;
+}
+
+.mdc-notched-outline__leading,
+.mdc-notched-outline__trailing,
+.mdc-notched-outline__notch {
+  border: 1px solid rgba(0, 0, 0, 0.23) !important;
+  border-radius: 4px !important;
+}
+
+.mdc-notched-outline__leading {
+  border-right: none !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.mdc-notched-outline__trailing {
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.mdc-notched-outline__notch {
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Fix input field positioning */
+.mdc-text-field__input {
+  padding: 16px 16px 8px 16px !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+  font-size: 16px !important;
+  caret-color: #1976d2 !important;
+}
+
+/* Fix floating label */
+.mdc-floating-label {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+}
+
+/* Alternative approach - hide problematic borders completely */
+.mat-mdc-form-field-outline-thick {
+  display: none !important;
+}
+
+.mat-mdc-form-field-outline {
+  color: rgba(0, 0, 0, 0.23) !important;
+}
+
+/* Ensure text is visible and properly positioned */
+.mat-mdc-input-element {
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  padding: 16px 0 8px 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+}

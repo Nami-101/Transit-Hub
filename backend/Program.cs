@@ -35,12 +35,13 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 // Add Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    // Password settings
+    // Password settings - relaxed for development
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 0;
     
     // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
@@ -49,6 +50,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     
     // User settings
     options.User.RequireUniqueEmail = true;
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 })
 .AddEntityFrameworkStores<TransitHubDbContext>()
 .AddDefaultTokenProviders();
@@ -130,14 +132,20 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transit-Hub API V1");
-    c.RoutePrefix = "swagger"; // Set Swagger UI at /swagger
-});
-
-app.UseHttpsRedirection();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transit-Hub API V1");
+        c.RoutePrefix = "swagger"; // Set Swagger UI at /swagger
+    });
+}
+else
+{
+    // Only use HTTPS redirection in production
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAngularApp");
 
@@ -150,10 +158,16 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<TransitHubDbContext>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    
     try
     {
         // Apply any pending migrations
         context.Database.Migrate();
+        
+        // Seed default roles
+        await SeedRolesAsync(roleManager);
         
         // Create stored procedures
         await CreateStoredProceduresAsync(context);
@@ -224,3 +238,26 @@ static async Task CreateStoredProceduresAsync(TransitHubDbContext context)
 }
 
 app.Run();
+
+static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+{
+    try
+    {
+        var roles = new[] { "Admin", "User", "Moderator" };
+        
+        foreach (var role in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+                Console.WriteLine($"Created role: {role}");
+            }
+        }
+        
+        Console.WriteLine("Role seeding completed successfully!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Role seeding failed: {ex.Message}");
+    }
+}

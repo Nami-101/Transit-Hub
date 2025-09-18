@@ -49,7 +49,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             
             <!-- Name Fields -->
             <div class="flex space-x-4">
-              <mat-form-field appearance="outline" class="flex-1">
+              <mat-form-field appearance="fill" class="flex-1">
                 <mat-label>First Name</mat-label>
                 <input matInput 
                        formControlName="firstName"
@@ -60,7 +60,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
                 </mat-error>
               </mat-form-field>
 
-              <mat-form-field appearance="outline" class="flex-1">
+              <mat-form-field appearance="fill" class="flex-1">
                 <mat-label>Last Name</mat-label>
                 <input matInput 
                        formControlName="lastName"
@@ -73,7 +73,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             </div>
 
             <!-- Email Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Email</mat-label>
               <input matInput 
                      type="email" 
@@ -90,7 +90,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             </mat-form-field>
 
             <!-- Phone Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Phone Number (Optional)</mat-label>
               <input matInput 
                      type="tel" 
@@ -100,7 +100,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             </mat-form-field>
 
             <!-- Date of Birth -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Date of Birth (Optional)</mat-label>
               <input matInput 
                      [matDatepicker]="picker"
@@ -110,7 +110,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             </mat-form-field>
 
             <!-- Password Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Password</mat-label>
               <input matInput 
                      [type]="hidePassword ? 'password' : 'text'"
@@ -135,7 +135,7 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
             </mat-form-field>
 
             <!-- Confirm Password Field -->
-            <mat-form-field appearance="outline" class="w-full">
+            <mat-form-field appearance="fill" class="w-full">
               <mat-label>Confirm Password</mat-label>
               <input matInput 
                      [type]="hideConfirmPassword ? 'password' : 'text'"
@@ -184,6 +184,30 @@ import { RegisterRequest, ApiResponse } from '../../../models/auth.dto';
   styles: [`
     .mat-mdc-form-field {
       width: 100%;
+    }
+    
+    /* Fix text cutoff issues */
+    .mat-mdc-text-field-wrapper {
+      min-height: 56px;
+    }
+    
+    .mat-mdc-form-field-input-control {
+      height: auto;
+      line-height: normal;
+    }
+    
+    .mat-mdc-form-field .mat-mdc-form-field-input-control input {
+      padding: 16px 0 8px 0;
+      line-height: 1.5;
+    }
+    
+    /* Ensure proper spacing for flexbox */
+    .flex.space-x-4 .mat-mdc-form-field {
+      margin-right: 1rem;
+    }
+    
+    .flex.space-x-4 .mat-mdc-form-field:last-child {
+      margin-right: 0;
     }
   `]
 })
@@ -234,11 +258,24 @@ export class RegisterComponent {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const registerRequest: RegisterRequest = this.registerForm.value;
+      // Prepare the request data with proper type conversion
+      const formValue = this.registerForm.value;
+      const registerRequest: RegisterRequest = {
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        email: formValue.email,
+        password: formValue.password,
+        confirmPassword: formValue.confirmPassword,
+        phoneNumber: formValue.phoneNumber || undefined,
+        dateOfBirth: formValue.dateOfBirth ? new Date(formValue.dateOfBirth) : undefined
+      };
+
+      console.log('Sending registration request:', registerRequest);
 
       this.authService.register(registerRequest).subscribe({
         next: (response: ApiResponse) => {
           this.isLoading = false;
+          console.log('Registration response:', response);
           if (response.success) {
             this.successMessage = 'Account created successfully! Redirecting to login...';
             setTimeout(() => {
@@ -246,18 +283,32 @@ export class RegisterComponent {
             }, 2000);
           } else {
             this.errorMessage = response.message || 'Registration failed. Please try again.';
+            if (response.errors && response.errors.length > 0) {
+              this.errorMessage += ' Errors: ' + response.errors.join(', ');
+            }
           }
         },
         error: (error: any) => {
           this.isLoading = false;
+          console.error('Registration error:', error);
+          
           if (error.error?.errors && Array.isArray(error.error.errors)) {
             this.errorMessage = error.error.errors.join(', ');
+          } else if (error.error?.message) {
+            this.errorMessage = error.error.message;
+          } else if (error.status === 400) {
+            this.errorMessage = 'Invalid registration data. Please check all fields and try again.';
           } else {
-            this.errorMessage = error.error?.message || 'An error occurred during registration. Please try again.';
+            this.errorMessage = 'An error occurred during registration. Please try again.';
           }
-          console.error('Registration error:', error);
         }
       });
+    } else {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.registerForm.controls).forEach(key => {
+        this.registerForm.get(key)?.markAsTouched();
+      });
+      this.errorMessage = 'Please fill all required fields correctly.';
     }
   }
 
